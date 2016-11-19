@@ -1,0 +1,148 @@
+   /* Class node is defined as :
+    class Node 
+       int val;   //Value
+       int ht;      //Height
+       Node left;   //Left child
+       Node right;   //Right child
+
+   */
+    static Node insert(Node root,int val){
+       Node tn  = new Node();
+       tn.val = val;
+       tn.left = null;
+       tn.right = null;
+       tn.ht = 0; 
+       if(root == null){
+           return tn;
+       }
+       else {
+//           System.out.print("Insrt Hts = "); powh(root);     
+           return insertAVL(root,tn);
+       }
+            
+    }
+
+   static Node insertAVL(Node root,Node tn)
+    {
+       if(root == null || tn == null) return root;
+       
+          if(root.val < tn.val){
+              if(root.right != null) {
+                 root.right = insertAVL(root.right,tn);                 
+             }
+             else{
+                 root.right = tn;
+             }
+          }
+          else{
+             if(root.left != null) {                 
+                 root.left = insertAVL(root.left,tn);                   
+             }
+             else{
+                 root.left = tn;                 
+             }                
+            }
+       
+       int hl=-1,hr=-1;
+        if(root.left != null)    
+           hl = root.left.ht; 
+        
+        if(root.right != null)          
+            hr = root.right.ht;
+       
+       root.ht = hl>hr ? hl+1 : hr+1 ;
+       
+       int diff = hl - hr;
+
+//       System.out.print("\nNode = "+root.val+" processesd for diff "+diff+" for hl = "+hl+" , hr = "+hr);       
+       if(diff>1 || diff<-1){
+           int p,q;
+           Node t;
+           if(hl>hr){
+               p = 0;
+               t = root.left;
+               hl=-1;hr=-1;  
+               if(t.left != null) hl = t.left.ht; 
+               if(t.right != null) hr =t.right.ht;             
+               
+               if(hl>hr) q = 0;
+               else q = 1;
+           }
+           else{
+               p = 1;
+               t = root.right;
+               hl=-1;hr=-1;  
+               if(t.left != null) hl = t.left.ht; 
+               if(t.right != null) hr =t.right.ht;    
+               
+               if(hl>hr) q = 0;
+               else q = 1;
+           }
+//           System.out.print("\n Hts = "); powh(root);           
+           root = balance(root,p,q);
+           root = setHeight(root);
+       }
+       return root;
+   }
+
+static void powh(Node t){
+    if(t == null) return;
+    powh(t.left);
+    System.out.print(t.val+"("+t.ht+") ,");
+    powh(t.right);
+}
+     static Node setHeight(Node t){
+        int hl=-1,hr=-1;
+        if(t.left != null){
+           t.left = setHeight(t.left);
+           hl = t.left.ht;             
+        }            
+        if(t.right != null){
+            t.right = setHeight(t.right);
+            hr = t.right.ht;
+        }
+        t.ht = hl>hr ? hl+1 : hr+1 ;
+        return t;
+     }
+
+    static Node balance(Node x, int p, int q){
+//        System.out.println("Balance called : "+x.val+" , l = "+p+" , r = "+q);
+        if(p==0){
+         if(q==0){
+            // LL Rotation
+            Node y = x.left;
+            x.left = y.right;
+            y.right = x;
+            return y;
+         }
+         else{
+            // LR Rotation
+            Node y = x.left;
+            Node z = y.right;
+             y.right = z.left;
+             z.left = y;
+             x.left = z.right;
+             z.right = x;           
+             return z;
+         }
+        }
+        else{
+         if(q==1){
+             //RR rotation
+            Node y = x.right;
+             x.right = y.left;
+             y.left = x;
+             return y;
+         }
+         else{
+             //RL rotaion
+            Node y = x.right;
+            Node z = y.left;
+             x.right = z.left;
+             z.left = x;
+             y.left = z.right;
+             z.right = y;
+             return z;             
+         }
+        }
+    }
